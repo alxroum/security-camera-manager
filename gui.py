@@ -2,6 +2,7 @@ from tkinter import *
 import tkinter as tk
 import cv2
 
+
 class GUI(Tk):
 
     def __init__(self, width, height):
@@ -41,5 +42,12 @@ class GUI(Tk):
         pass
 
 
-graphics = GUI(1000, 600)
-graphics.mainloop()
+def main():
+    # graphics = GUI(1000, 600)
+    # graphics.mainloop()
+    pass
+
+
+
+
+main()

@@ -9,11 +9,14 @@ def main():
 def capture_video(camera_name):
     vc = cv2.VideoCapture(0)
 
-    while(True):
+    while True:
 
         frame = vc.read()
 
         cv2.imshow(camera_name, frame)
+
+        cv2.waitKey(1)
+        break
 
         
 
