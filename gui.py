@@ -16,8 +16,6 @@ class GUI(Tk):
 
         # pre display settings
 
-        self.overrideredirect(True)
-
         self.geometry("600x400")  # setting default size of the window
 
         # fixing window size for now
@@ -31,18 +29,20 @@ class GUI(Tk):
         # creating the navigation bar frame which is placed at the top
         self.nav_frame = Frame(self.main_frame, bg="#1a1a1c")
         self.nav_frame.pack(expand="yes", fill="x", side="top", anchor="n")
+        self.nav_frame.bind("<B1-Motion>", lambda x: self.move_app(self))
 
         self.menu_image = PhotoImage(file="assets/hamburger_menu_button_white.png")
-        self.menu_button = tk.Button(self.nav_frame, width=16, height=16, image=self.menu_image, bg="#1a1a1c", relief="solid", borderwidth=0)
+        self.menu_button = tk.Button(self.nav_frame, width=16, height=16, image=self.menu_image, bg="#1a1a1c", relief="solid", borderwidth=0, command=self.side_menu)
         self.menu_button.pack(side="left", padx=10, pady=10)
 
+        """
         self.minimize_image = PhotoImage(file="assets/minimize_button.png")
         self.minimize = Button(self.nav_frame, image=self.minimize_image, bg="#1a1a1c", relief="solid", borderwidth=0, command=self.minimize)
         self.close = Button(self.nav_frame, text="close", bg="#1a1a1c", relief="solid", fg="white", borderwidth=0, command=self.quit)
 
         self.close.pack(side="right", padx=10, pady=10)
         self.minimize.pack(side="right")
-
+        """
 
 
 
@@ -52,7 +52,8 @@ class GUI(Tk):
         self.side_bar.pack(expand="yes", fill="y", side="bottom", anchor="w")
 
 
-
+        if self.side_menu_open:
+            print('open')
 
 
         """
@@ -61,17 +62,15 @@ class GUI(Tk):
         """
 
 
-    def show_side_menu(self):
-        print("showing side menu")
-        self.side_menu_open = True
+    def side_menu(self):
 
-    def hide_side_menu(self):
-        print("hiding side menu")
-        if self.side_menu_open:
+        if self.side_menu_open == True:
+            print("hiding side menu")
             self.side_menu_open = False
 
-    def minimize(self):
-        print("minimize")
+        if self.side_menu_open == False:
+            print("showing side menu")
+            self.side_menu_open = True
 
 
 
