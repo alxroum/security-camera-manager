@@ -1,29 +1,27 @@
 import gui
 import cv2
 
+
 def main():
     print('Starting Program ...')
-    #capture_video("camera_1")
+    stream_video()
 
 
-def capture_video(camera_name):
-    vc = cv2.VideoCapture(0)
+def stream_video():
+    url = 'http://192.168.0.110:8080/video'
+    cap = cv2.VideoCapture(url)
 
     while True:
+        ret, frame = cap.read()
+        if frame is not None:
+            cv2.imshow("frame", frame)
 
-        frame = vc.read()
+        q = cv2.waitKey(1)
+        if q == ord("q"):
+            break
 
-        cv2.imshow(camera_name, frame)
-
-        cv2.waitKey(1)
-        break
-
-        
+    cv2.destroyAllWindows
 
 
-    vc.release()
-    
-    cv2.destroyAllWindows()
 
-if __name__ == "__file_manager__":
-    main()
+main()
