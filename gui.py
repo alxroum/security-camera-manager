@@ -1,5 +1,7 @@
 from tkinter import *
 import tkinter as tk
+import customtkinter
+from tkinter_webcam import webcam
 import cv2
 
 
@@ -8,6 +10,9 @@ class GUI(Tk):
     def __init__(self, width, height):
         Tk.__init__(self)
 
+        color_1 = '#1a1a1c'
+        color_2 = '#2b2b2e'
+
         # variables
         self.width = width
         self.height = height
@@ -15,62 +20,57 @@ class GUI(Tk):
         self.side_menu_open = False
 
         # pre display settings
-
+        self.title('Security Camera Viewer')
+        icon = PhotoImage(file='assets/camera_icon.png')
+        self.iconphoto(True, icon)
         self.geometry("600x400")  # setting default size of the window
 
-        # fixing window size for now
-        # self.minsize(self.width, self.height)
-        # self.maxsize(self.width, self.height)
-
-        # creating the main frame
-        self.main_frame = Frame(self, bg="#2b2b2e")  # main background frame
-        self.main_frame.pack(expand="yes", fill="both")
-
         # creating the navigation bar frame which is placed at the top
-        self.nav_frame = Frame(self.main_frame, bg="#1a1a1c")
-        self.nav_frame.pack(expand="yes", fill="x", side="top", anchor="n")
-        self.nav_frame.bind("<B1-Motion>", lambda x: self.move_app(self))
+        self.nav_frame = Frame(self, bg=color_1)
+        self.nav_frame.pack(side='top', fill='x')
 
         self.menu_image = PhotoImage(file="assets/hamburger_menu_button_white.png")
-        self.menu_button = tk.Button(self.nav_frame, width=16, height=16, image=self.menu_image, bg="#1a1a1c", relief="solid", borderwidth=0, command=self.side_menu)
+        self.menu_button = tk.Button(self.nav_frame, width=16, height=16, image=self.menu_image, bg=color_1, relief="solid", borderwidth=0, command=self.side_menu)
         self.menu_button.pack(side="left", padx=10, pady=10)
 
-        """
-        self.minimize_image = PhotoImage(file="assets/minimize_button.png")
-        self.minimize = Button(self.nav_frame, image=self.minimize_image, bg="#1a1a1c", relief="solid", borderwidth=0, command=self.minimize)
-        self.close = Button(self.nav_frame, text="close", bg="#1a1a1c", relief="solid", fg="white", borderwidth=0, command=self.quit)
-
-        self.close.pack(side="right", padx=10, pady=10)
-        self.minimize.pack(side="right")
-        """
-
-
+        # main frame holding the bottom section of the screen under the nav-bar
+        self.main_frame = Frame(self, bg=color_2)
+        self.main_frame.pack(expand=True, fill='both', anchor='s')
 
         # sidebar
+        self.sidebar = Frame(self.main_frame, bg=color_1)
+        self.sidebar.place(relx=0, rely=0, relwidth=0.2, relheight=1)
 
-        self.side_bar = Frame(self.main_frame, bg="white")
-        self.side_bar.pack(expand="yes", fill="y", side="bottom", anchor="w")
+        # creating the main camera display frame
+        self.cam_frame = Frame(self.main_frame, bg=color_2)  # main background frame
+        self.cam_frame.place(relx=0.2, rely=0, relwidth=0.8, relheight=1)
 
+
+        self.cam_1 = Frame(self.cam_frame, bg='blue')
+        self.cam_1.grid(row=0, column=0, sticky="nsew", rowspan=2)
+        self.img1 = PhotoImage(file='assets/hamburger_menu_button.png')
+        self.label = Label(self.cam_1, image=self.img1)
+        self.label.pack()
+
+        self.cam_2 = Frame(self.cam_frame, bg='red')
+        self.cam_2.grid(row=0, column=1, sticky="nsew")
 
         if self.side_menu_open:
             print('open')
 
 
-        """
-        self.menu_button.bind('<Button-1>', lambda e: self.show_side_menu())  # opens expanded menu when button is clicked
-        self.menu_button.bind('<Leave>', lambda e: self.hide_side_menu())  # exits when mouse leaves expanded menu
-        """
-
-
     def side_menu(self):
 
-        if self.side_menu_open == True:
+        if self.side_menu_open:
             print("hiding side menu")
             self.side_menu_open = False
 
-        if self.side_menu_open == False:
+        if not self.side_menu_open:
             print("showing side menu")
             self.side_menu_open = True
+
+    def cam_change(self, e):
+        print(f'Camera Changed To {e}')
 
 
 
