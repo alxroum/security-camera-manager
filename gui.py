@@ -21,16 +21,18 @@ class GUI(Tk):
         self.title('Security Camera Viewer')
         icon = PhotoImage(file='assets/camera_icon.png')
         self.iconphoto(True, icon)
-        self.minsize(width=300, height=150)
+        #self.minsize(width=300, height=150)
         # self.geometry("600x400")  # setting default size of the window
 
         style = ttkthemes.ThemedStyle()
         style.theme_use("equilux")
 
+        self.configure(bg=color_2)
         self.menu_frame = Frame(self)
-        self.menu_frame.place(relx=0, rely=0, relwidth=1, relheight=1)
+        self.menu_frame.pack(padx=75, pady=40)
+        #self.menu_frame.place(relx=0, rely=0, relwidth=1, relheight=1)
         self.menu_frame.configure(bg=color_2)
-        self.menu_frame.tkraise()
+        #self.menu_frame.tkraise()
 
         self.cam_names = ['default', 'Camera 1', 'Camera 2', 'Camera 3']
         self.cams = []
@@ -70,7 +72,7 @@ class Camera(tk.Toplevel):
         color_2 = '#2b2b2e'
 
         # pre display settings
-        self.title('Security Camera Viewer')
+        self.title(name)
         icon = PhotoImage(file='assets/camera_icon.png')
         self.iconphoto(True, icon)
         self.minsize(width=300, height=150)
