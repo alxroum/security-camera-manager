@@ -4,6 +4,7 @@ import customtkinter
 from tkinter import ttk
 from tkinter_webcam import webcam
 import ttkthemes
+import time
 import cv2
 
 
@@ -21,7 +22,7 @@ class GUI(Tk):
         self.title('Security Camera Viewer')
         icon = PhotoImage(file='assets/camera_icon.png')
         self.iconphoto(True, icon)
-        #self.minsize(width=300, height=150)
+        # self.minsize(width=300, height=150)
         # self.geometry("600x400")  # setting default size of the window
 
         style = ttkthemes.ThemedStyle()
@@ -30,25 +31,26 @@ class GUI(Tk):
         self.configure(bg=color_2)
         self.menu_frame = Frame(self)
         self.menu_frame.pack(padx=75, pady=40)
-        #self.menu_frame.place(relx=0, rely=0, relwidth=1, relheight=1)
+        # self.menu_frame.place(relx=0, rely=0, relwidth=1, relheight=1)
         self.menu_frame.configure(bg=color_2)
-        #self.menu_frame.tkraise()
+        # self.menu_frame.tkraise()
 
         self.cam_names = ['default', 'Camera 1', 'Camera 2', 'Camera 3']
         self.cams = []
 
-
-        self.lab1 = Label(self.menu_frame, text='Select a Camera to View', bg=color_2, fg='white', font='Helvetica 10 bold')
+        self.lab1 = Label(self.menu_frame, text='Select a Camera to View', bg=color_2, fg='white',
+                          font='Helvetica 10 bold')
         self.lab1.pack()
 
         self.cam_select = ttk.Combobox(self.menu_frame, values=self.cam_names)
         self.cam_select.pack(anchor='center')
         self.cam_select['state'] = 'readonly'
         self.cam_select.set('default')
-        self.cam_select.bind(sequence='<<ComboboxSelected>>', func=lambda event: self.cam_change(event, self.cam_select))
+        self.cam_select.bind(sequence='<<ComboboxSelected>>',
+                             func=lambda event: self.cam_change(event, self.cam_select))
 
-        #self.cam1 = Camera(self.menu_frame, self.get_current_cam())
-        #self.cam1.pack(expand=True, fill='both')
+        # self.cam1 = Camera(self.menu_frame, self.get_current_cam())
+        # self.cam1.pack(expand=True, fill='both')
 
         for cam in self.cams:
             cam.mainloop()
@@ -57,16 +59,20 @@ class GUI(Tk):
         print(f'Camera is Set To {box.get()}')
         self.current_cam = box.get()
         if box.get() != 'default':
-            self.cams.append(Camera(self.current_cam))
-
+            self.withdraw()
+            self.update()
+            time.sleep(0.1)
+            self.cams.append(CamView(self, self.current_cam))
 
     def get_current_cam(self):
         return self.current_cam
 
 
-class Camera(tk.Toplevel):
-    def __init__(self, name: str = 'Camera 0'):
+class CamView(tk.Toplevel):
+    def __init__(self, parent: GUI, name: str = 'Camera 0'):
         Toplevel.__init__(self)
+
+        self.parent = parent
 
         color_1 = '#1a1a1c'
         color_2 = '#2b2b2e'
@@ -83,7 +89,7 @@ class Camera(tk.Toplevel):
 
         self.menu_image = PhotoImage(file="assets/hamburger_menu_button_white.png")
         self.menu_button = tk.Button(self.nav_frame, width=16, height=16, image=self.menu_image, bg=color_1,
-                                     relief="solid", borderwidth=0)
+                                     relief="solid", borderwidth=0, command=self.show_main_window)
         self.menu_button.pack(side="left", padx=10, pady=10)
 
         self.cam_title = Label(self.nav_frame, text=name, bg=color_1, fg='white', font='Helvetica 12 bold')
@@ -99,12 +105,18 @@ class Camera(tk.Toplevel):
         self.sidebar_title = Label(self.sidebar, text='Camera Properties', bg=color_1, fg='white')
         self.sidebar_title.pack()
 
+    def show_main_window(self):
+        print('show main window')
+        self.parent.deiconify()
+        self.destroy()
+
+
 def main():
     graphics = GUI()
     graphics.mainloop()
 
-    #cam = Camera()
-    #cam.mainloop()
+    # cam = Camera()
+    # cam.mainloop()
 
 
 main()

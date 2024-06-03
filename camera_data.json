@@ -1,0 +1,16 @@
+[
+    {
+        "Name": "Camera 1",
+        "CV_ID": 0,
+        "Type": 0,
+        "Save Interval": 120,
+        "Is Recording": false
+    },
+    {
+        "Name": "Camera 2",
+        "CV_ID": 0,
+        "Type": 0,
+        "Save Interval": 120,
+        "Is Recording": false
+    }
+]
