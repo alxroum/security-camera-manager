@@ -1,6 +1,7 @@
 [
     {
         "Name": "Camera 1",
+        "Cam ID": 0,
         "CV_ID": 0,
         "Type": 0,
         "Save Interval": 120,
@@ -8,6 +9,7 @@
     },
     {
         "Name": "Camera 2",
+        "Cam ID": 1,
         "CV_ID": 0,
         "Type": 0,
         "Save Interval": 120,

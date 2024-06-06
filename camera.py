@@ -4,8 +4,9 @@ import json
 
 class Camera:
 
-    def __init__(self, name='unnamed_cam_01', cv_id=0, cam_type=0, save_interval=120):
+    def __init__(self, name='unnamed_cam_01', cam_id=0, cv_id=0, cam_type=0, save_interval=120):
         self.__name = name
+        self.__cam_id = cam_id
         self.__cv_id = cv_id
         self.__cam_type = cam_type  # wired or wireless - 0 or 1 respectively
         self.__save_interval = save_interval  # seconds between saves
@@ -21,6 +22,7 @@ class Camera:
 
         self.__info_dict = {
             'Name': self.__name,
+            'Cam ID': self.__cam_id,
             'CV_ID': self.__cv_id,
             'Type': self.__cam_type,
             'Save Interval': self.__save_interval,

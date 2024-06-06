@@ -26,15 +26,10 @@ class CameraManager:
         except FileNotFoundError:
             print('File Does Not Exist.')
 
+
+    def get_entries(self):
+        return self.__cameras
+
     def __str__(self):
         return json.dumps(self.__cameras, indent=4)
 
-
-c1 = Camera('Camera 1', 0, 0)
-c2 = Camera('Camera 2', 0, 0)
-c = CameraManager('camera_data.json')
-c.add_camera(c1)
-c.add_camera(c2)
-#c.write_file()
-c.read_file()
-#print(c)

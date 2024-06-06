@@ -5,6 +5,7 @@ from tkinter import ttk
 from tkinter_webcam import webcam
 import ttkthemes
 import time
+from camera_manager import CameraManager
 import cv2
 
 
@@ -17,6 +18,8 @@ class GUI(Tk):
         color_2 = '#2b2b2e'
 
         self.current_cam = 'default'
+
+        self.__camera_manager = CameraManager('camera_data.json')
 
         # pre display settings
         self.title('Security Camera Viewer')
@@ -35,8 +38,12 @@ class GUI(Tk):
         self.menu_frame.configure(bg=color_2)
         # self.menu_frame.tkraise()
 
-        self.cam_names = ['default', 'Camera 1', 'Camera 2', 'Camera 3']
-        self.cams = []
+        self.cam_names = ['default']
+        # order of camera names must match order of file for correct data processing
+        self.cam_names += [e['Name'] for e in self.__camera_manager.get_entries()]
+
+        print(self.cam_names)
+        self.cams = []  # list of active cams. As of now this should only ever have one item
 
         self.lab1 = Label(self.menu_frame, text='Select a Camera to View', bg=color_2, fg='white',
                           font='Helvetica 10 bold')
@@ -62,26 +69,29 @@ class GUI(Tk):
             self.withdraw()
             self.update()
             time.sleep(0.1)
-            self.cams.append(CamView(self, self.current_cam))
+            self.cams.append(CamView(self, self.current_cam, self.__camera_manager.get_entries()))
 
     def get_current_cam(self):
         return self.current_cam
 
 
 class CamView(tk.Toplevel):
-    def __init__(self, parent: GUI, name: str = 'Camera 0'):
+    def __init__(self, parent: GUI, name: str = 'Camera 0', data: list = ()):
         Toplevel.__init__(self)
 
-        self.parent = parent
+        self.__parent = parent
+        self.__camera_data = get_data_from_name(name, data)
+        # print(self.__camera_data)
 
         color_1 = '#1a1a1c'
         color_2 = '#2b2b2e'
+        color_3 = '#242426'
 
         # pre display settings
         self.title(name)
         icon = PhotoImage(file='assets/camera_icon.png')
         self.iconphoto(True, icon)
-        self.minsize(width=300, height=150)
+        self.minsize(width=1280, height=720)
 
         # creating the navigation bar frame which is placed at the top
         self.nav_frame = Frame(self, bg=color_1, borderwidth=1, relief='solid')
@@ -93,29 +103,60 @@ class CamView(tk.Toplevel):
         self.menu_button.pack(side="left", padx=10, pady=10)
 
         self.cam_title = Label(self.nav_frame, text=name, bg=color_1, fg='white', font='Helvetica 12 bold')
-        self.cam_title.pack(expand=True, fill='y')
+        self.cam_title.pack(expand=True, fill='x')
 
         # main frame holding the bottom section of the screen under the nav-bar
         self.main_frame = Frame(self, bg=color_2)
         self.main_frame.pack(expand=True, fill='both', anchor='s')
 
+        # camera view goes here ---
+
         # sidebar
-        self.sidebar = Frame(self.main_frame, bg=color_1)
+        self.sidebar = Frame(self.main_frame, bg=color_3)
         self.sidebar.place(relx=0, rely=0, relwidth=0.2, relheight=1)
-        self.sidebar_title = Label(self.sidebar, text='Camera Properties', bg=color_1, fg='white')
-        self.sidebar_title.pack()
+
+        self.title_frame = Frame(self.sidebar, bg=color_1)
+        self.title_frame.pack(fill='x')
+        self.sidebar_title = Label(self.title_frame, text='Camera Properties', bg=color_1, fg='white',
+                                   font='Helvetica 11 bold')
+        self.sidebar_title.pack(fill='x', pady=10)
+
+        self.info_frame = Frame(self.sidebar, bg=color_3)
+        self.info_frame.pack(fill='x', side='top')
+
+        self.name_prop = Label(self.info_frame, text=self.__camera_data['Name'], bg=color_3, fg='white',
+                               font='Helvetica 10 bold')
+        self.name_prop.pack(side='top')
+        # self.name_prop.insert(0, self.__camera_data['Name'])  # may need to redo camera data system, so as of now
+        # this field is read only
+
+        self.id_prop = Label(self.info_frame, text=f'ID: {self.__camera_data['Cam ID']}', bg=color_3, fg='white',
+                             font='Helvetica 10 bold')
+        self.id_prop.pack(side='top')
+
+        self.save_prop = Button(self.sidebar, text='Save Changes')
+        self.save_prop.pack(fill='x', side='bottom', pady=15, padx=15)
 
     def show_main_window(self):
         print('show main window')
-        self.parent.deiconify()
+        self.__parent.deiconify()
         self.destroy()
+
+
+def get_data_from_name(name, data):
+    # find the dictionary with the name value matching the input name then return
+
+    for e in data:
+        if e['Name'] == name:
+            return e
+    return None
 
 
 def main():
     graphics = GUI()
     graphics.mainloop()
 
-    # cam = Camera()
+    # cam = CamView()
     # cam.mainloop()
 
 
