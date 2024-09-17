@@ -40,7 +40,7 @@ class GUI(Tk):
 
         self.cam_names = ['default']
         # order of camera names must match order of file for correct data processing
-        self.cam_names += [e['Name'] for e in self.__camera_manager.get_entries()]
+        self.cam_names += [e['Name'] for e in self.__camera_manager.get_entries().values()]
 
         print(self.cam_names)
         self.cams = []  # list of active cams. As of now this should only ever have one item
@@ -69,23 +69,27 @@ class GUI(Tk):
             self.withdraw()
             self.update()
             time.sleep(0.1)
-            self.cams.append(CamView(self, self.current_cam, self.__camera_manager.get_entries()))
+            self.cams.append(CamView(self, self.__camera_manager.get_entries(), self.current_cam))
 
     def get_current_cam(self):
         return self.current_cam
 
+    def get_camera_manager(self):
+        return self.__camera_manager
+
 
 class CamView(tk.Toplevel):
-    def __init__(self, parent: GUI, name: str = 'Camera 0', data: list = ()):
+    def __init__(self, parent: GUI, data, name: str = 'Camera 0'):
         Toplevel.__init__(self)
 
         self.__parent = parent
         self.__camera_data = get_data_from_name(name, data)
         # print(self.__camera_data)
+        self.__camera_manager = parent.get_camera_manager()
 
         color_1 = '#1a1a1c'
-        color_2 = '#2b2b2e'
-        color_3 = '#242426'
+        color_2 = '#393A3E'
+        color_3 = '#2b2b2e'
 
         # pre display settings
         self.title(name)
@@ -111,6 +115,9 @@ class CamView(tk.Toplevel):
 
         # camera view goes here ---
 
+        self.__camera_manager.get_frame()
+        # load and display camera view here based on the camera selected in the gui
+
         # sidebar
         self.sidebar = Frame(self.main_frame, bg=color_3)
         self.sidebar.place(relx=0, rely=0, relwidth=0.2, relheight=1)
@@ -130,12 +137,12 @@ class CamView(tk.Toplevel):
         # self.name_prop.insert(0, self.__camera_data['Name'])  # may need to redo camera data system, so as of now
         # this field is read only
 
-        self.id_prop = Label(self.info_frame, text=f'ID: {self.__camera_data['Cam ID']}', bg=color_3, fg='white',
+        self.id_prop = Label(self.info_frame, text=f'CV_ID: {self.__camera_data['CV_ID']}', bg=color_3, fg='white',
                              font='Helvetica 10 bold')
         self.id_prop.pack(side='top')
 
-        self.save_prop = Button(self.sidebar, text='Save Changes')
-        self.save_prop.pack(fill='x', side='bottom', pady=15, padx=15)
+        self.save_prop = Button(self.sidebar, text='Save Changes', bg=color_2, fg='white', font='Helvetica 10 bold')
+        self.save_prop.pack(fill='x', side='bottom', pady=12, padx=12)
 
     def show_main_window(self):
         print('show main window')
@@ -146,7 +153,7 @@ class CamView(tk.Toplevel):
 def get_data_from_name(name, data):
     # find the dictionary with the name value matching the input name then return
 
-    for e in data:
+    for e in data.values():
         if e['Name'] == name:
             return e
     return None
