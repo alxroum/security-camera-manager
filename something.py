@@ -1,37 +1,64 @@
+# Python program to open the
+# camera in Tkinter
+# Import the libraries,
+# tkinter, cv2, Image and ImageTk
+
+from tkinter import *
 import cv2
-import threading
+from PIL import Image, ImageTk
+
+# Define a video capture object
+vid = cv2.VideoCapture(0)
+
+# Declare the width and height in variables
+width, height = 800, 600
+
+# Set the width and height
+vid.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+vid.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+
+# Create a GUI app
+app = Tk()
+
+# Bind the app with Escape keyboard to
+# quit app whenever pressed
+app.bind('<Escape>', lambda e: app.quit())
+
+# Create a label and display it on app
+label_widget = Label(app)
+label_widget.pack()
 
 
-class cam_thread(threading.Thread):
-    def __init__(self, preview_name, cam_id):
-        threading.Thread.__init__(self)
-        self.preview_name = preview_name
-        self.cam_id = cam_id
-
-    def run(self):
-        print("Starting " + self.preview_name)
-        cam_preview(self.preview_name, self.cam_id)
+# Create a function to open camera and
+# display it in the label_widget on app
 
 
-def cam_preview(preview_name, cam_id):
-    cv2.namedWindow(preview_name)
-    cam = cv2.VideoCapture(cam_id)
-    if cam.isOpened():  # try to get the first frame
-        rval, frame = cam.read()
-    else:
-        rval = False
+def open_camera():
+    # Capture the video frame by frame
+    _, frame = vid.read()
 
-    while rval:
-        cv2.imshow(preview_name, frame)
-        rval, frame = cam.read()
-        key = cv2.waitKey(20)
-        if key == 27:  # exit on ESC
-            break
-    cv2.destroyWindow(preview_name)
+    # Convert image from one color space to other
+    opencv_image = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
+
+    # Capture the latest frame and transform to image
+    captured_image = Image.fromarray(opencv_image)
+
+    # Convert captured image to photoimage
+    photo_image = ImageTk.PhotoImage(image=captured_image)
+
+    # Displaying photoimage in the label
+    label_widget.photo_image = photo_image
+
+    # Configure image in the label
+    label_widget.configure(image=photo_image)
+
+    # Repeat the same process after every 10 seconds
+    label_widget.after(10, open_camera)
 
 
-# Create two threads as follows
-thread1 = cam_thread("Camera 0", 0)
-thread2 = cam_thread("Camera 1", 1)
-thread1.start()
-thread2.start()
+# Create a button to open the camera in GUI app
+button1 = Button(app, text="Open Camera", command=open_camera)
+button1.pack()
+
+# Create an infinite loop for displaying app on screen
+app.mainloop()

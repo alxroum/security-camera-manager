@@ -39,15 +39,6 @@ class CameraManager:
             si = data[i]['Save Interval']
             temp = Camera(name, cv_id, type_, si)
 
-    def get_frame(self):  # returns a frame from the camera that is currently being viewed
-        # needs to manage cv2 by switching the camera to the camera being shown in the gui
-        """
-        cap = cv2.VideoCapture(0)  # video capture source camera (Here webcam of laptop)
-        ret, frame = cap.read()  # return a single frame in variable `frame`
-        cap.release()
-        """
-        print("FRAME!!!")
-
     def get_entries(self):
         return self.__cameras
 

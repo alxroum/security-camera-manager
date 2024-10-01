@@ -1,12 +1,17 @@
+import threading
 from tkinter import *
 import tkinter as tk
 import customtkinter
 from tkinter import ttk
+
+from PIL import ImageTk
 from tkinter_webcam import webcam
 import ttkthemes
 import time
+from PIL import ImageTk, Image
 from camera_manager import CameraManager
 import cv2
+import cam_view
 
 
 class GUI(Tk):
@@ -83,9 +88,14 @@ class CamView(tk.Toplevel):
         Toplevel.__init__(self)
 
         self.__parent = parent
+        self.__frame = None
+        self.cap = cv2.VideoCapture(0)  # the number selects the camera that will be displayed
         self.__camera_data = get_data_from_name(name, data)
         # print(self.__camera_data)
         self.__camera_manager = parent.get_camera_manager()
+
+        self.__width = 1280
+        self.__height = 720
 
         color_1 = '#1a1a1c'
         color_2 = '#393A3E'
@@ -95,7 +105,7 @@ class CamView(tk.Toplevel):
         self.title(name)
         icon = PhotoImage(file='assets/camera_icon.png')
         self.iconphoto(True, icon)
-        self.minsize(width=1280, height=720)
+        self.minsize(width=self.__width, height=self.__height)
 
         # creating the navigation bar frame which is placed at the top
         self.nav_frame = Frame(self, bg=color_1, borderwidth=1, relief='solid')
@@ -115,8 +125,14 @@ class CamView(tk.Toplevel):
 
         # camera view goes here ---
 
-        self.__camera_manager.get_frame()
-        # load and display camera view here based on the camera selected in the gui
+        # self.master.after(3000, self.update)  # calling the function continuously
+        self.canvas = tk.Canvas(self.main_frame)
+        self.canvas.pack(anchor='e', expand=True, fill='both')  # this is placed in the correct spot
+        # self.t = threading.Thread(target=self.update())
+        # self.t.start()
+        self.update_image()
+
+        print("Active Camera: " + parent.get_current_cam())
 
         # sidebar
         self.sidebar = Frame(self.main_frame, bg=color_3)
@@ -143,6 +159,17 @@ class CamView(tk.Toplevel):
 
         self.save_prop = Button(self.sidebar, text='Save Changes', bg=color_2, fg='white', font='Helvetica 10 bold')
         self.save_prop.pack(fill='x', side='bottom', pady=12, padx=12)
+
+    def update_image(self):
+        # Get the latest frame and convert image format
+
+        self.image = cv2.cvtColor(self.cap.read()[1], cv2.COLOR_BGR2RGB)  # to RGB
+        self.image = Image.fromarray(self.image)  # to PIL format
+        self.image = ImageTk.PhotoImage(self.image)  # to ImageTk format
+        # Update image
+        self.canvas.create_image((self.__width * 1.20)/2, self.__height/2, anchor=CENTER, image=self.image)
+        # Repeat every 'interval' ms
+        self.after(70, self.update_image)
 
     def show_main_window(self):
         print('show main window')
